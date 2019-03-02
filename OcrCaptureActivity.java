@@ -63,6 +63,12 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private static final int RC_HANDLE_GMS = 9001;
 
     private int count = 0;
+    TextBlock[] text = new TextBlock[4];
+
+    CharSequence success = "Successful Tap!";
+    CharSequence failure = "Please Tap Again!";
+    int duration = Toast.LENGTH_SHORT;
+
 
     // Permission request codes need to be < 256
     private static final int RC_HANDLE_CAMERA_PERM = 2;
@@ -325,32 +331,29 @@ public final class OcrCaptureActivity extends AppCompatActivity {
      */
     private boolean onTap(float rawX, float rawY) {
         OcrGraphic graphic = mGraphicOverlay.getGraphicAtLocation(rawX, rawY);
-        TextBlock[] text = new TextBlock[4];
-        //TextBlock invoiceNo = null;
-        //TextBlock vendorName = null;
-        //TextBlock totalAmount = null;
-        //TextBlock invoiceDate = null;
         if (graphic != null) {
             text[count] = graphic.getTextBlock();
-            if (text[count] != null && text[count].getValue() != null) {
-                if(text[count] != null)
-                    count++;
-                if(count==4)
-                {
-                    Intent data = new Intent();
-                    data.putExtra(TextBlockObject, text[0].getValue() + "\n" + text[1].getValue() + "\n" + text[2].getValue() + "\n" + text[3].getValue() );
-                    setResult(CommonStatusCodes.SUCCESS, data);
-                    finish();
-                }
+            Toast.makeText(getApplicationContext(), success, duration).show();
+            Log.d("haard ",text[count].getValue());
+            if (text[count].getValue() != null) {
+                count++;
             }
             else {
                 Log.d(TAG, "text data is null");
             }
+            if(count==4)
+            {
+                Intent data = new Intent();
+                data.putExtra(TextBlockObject, text[0].getValue() + "\n" + text[1].getValue() + "\n" + text[2].getValue() + "\n" + text[3].getValue() );
+                setResult(CommonStatusCodes.SUCCESS, data);
+                finish();
+            }
         }
         else {
             Log.d(TAG,"no text detected");
+            Toast.makeText(getApplicationContext(), failure, duration).show();
         }
-        return (count==4);
+        return true;
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {
